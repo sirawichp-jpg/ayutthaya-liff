@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>สร้างตัวละคร · ตำนานนครศรีอโยธยา</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700;800&family=Noto+Serif+Thai:wght@600;700;900&display=swap" rel="stylesheet">
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<style>
+:root {
+  --night: #1A0F2E;
+  --deep: #2E1A47;
+  --gold: #D4AF37;
+  --gold-soft: #B8860B;
+  --cream: #F5E6C8;
+  --red: #8B0000;
+  --green: #2E7D32;
+  --ink: #1A1A1A;
+  --gray: #888;
+  --line: rgba(212, 175, 55, 0.25);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  font-family: 'Sarabun', sans-serif;
+  background: var(--night);
+  background-image:
+    radial-gradient(ellipse at top, rgba(212, 175, 55, 0.12), transparent 60%),
+    radial-gradient(ellipse at bottom, rgba(139, 0, 0, 0.15), transparent 70%);
+  color: var(--cream);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+.serif { font-family: 'Noto Serif Thai', serif; }
+
+.app { max-width: 480px; margin: 0 auto; padding: 16px 16px 100px; min-height: 100vh; }
+
+/* HEADER */
+.header { text-align: center; padding: 12px 0 20px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+.header-eyebrow { letter-spacing: 4px; font-size: 11px; color: var(--gold); margin-bottom: 6px; }
+.header h1 { font-family: 'Noto Serif Thai', serif; font-size: 22px; color: var(--gold); font-weight: 800; }
+
+/* STEPPER */
+.stepper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 4px; }
+.step-dot {
+  flex: 1; display: flex; flex-direction: column; align-items: center; position: relative;
+  font-size: 10px; color: var(--gray);
+}
+.step-dot .dot {
+  width: 28px; height: 28px; border-radius: 50%; background: var(--deep);
+  border: 1.5px solid var(--gray); display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--gray); margin-bottom: 4px;
+  transition: all 0.25s;
+}
+.step-dot.active .dot { background: var(--gold); border-color: var(--gold); color: var(--night); }
+.step-dot.done .dot { background: var(--green); border-color: var(--green); color: white; }
+.step-dot.active .label { color: var(--gold); font-weight: 700; }
+.step-dot.done .label { color: var(--green); }
+.step-line {
+  position: absolute; top: 13px; left: 50%; right: -50%; height: 1.5px; background: var(--gray); z-index: -1;
+}
+.step-dot:last-child .step-line { display: none; }
+.step-dot.done .step-line { background: var(--green); }
+
+/* STEP CONTENT */
+.step { display: none; }
+.step.active { display: block; }
+.step h2 {
+  font-family: 'Noto Serif Thai', serif;
+  font-size: 20px; color: var(--gold); margin-bottom: 6px; font-weight: 700;
+}
+.step .step-desc { font-size: 13px; color: var(--cream); opacity: 0.8; margin-bottom: 18px; }
+
+/* OPTION CARDS */
+.option-grid { display: grid; gap: 10px; }
+.option-card {
+  background: var(--deep);
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.option-card:active { transform: scale(0.98); }
+.option-card.selected {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(212, 175, 55, 0.05));
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+.option-card .opt-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.option-card .opt-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--night); display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.option-card.selected .opt-icon { background: var(--gold); }
+.option-card .opt-title {
+  font-family: 'Noto Serif Thai', serif;
+  font-size: 16px; font-weight: 700; color: var(--cream); line-height: 1.2;
+}
+.option-card .opt-en { font-size: 11px; color: var(--gold); opacity: 0.7; }
+.option-card .opt-desc { font-size: 12px; color: var(--cream); opacity: 0.7; line-height: 1.5; margin-top: 4px; }
+.option-card .opt-stats {
+  font-size: 11px; color: var(--gold); margin-top: 8px;
+  padding-top: 8px; border-top: 1px dashed rgba(212, 175, 55, 0.2);
+}
+
+/* STATS STEP */
+.stat-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--deep); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px;
+  border: 1px solid var(--line);
+}
+.stat-info { flex: 1; }
+.stat-name { font-family: 'Noto Serif Thai', serif; font-size: 16px; color: var(--gold); font-weight: 700; }
+.stat-desc { font-size: 11px; color: var(--cream); opacity: 0.65; }
+.stat-select {
+  background: var(--night); color: var(--gold); border: 1.5px solid var(--gold);
+  border-radius: 6px; padding: 8px 12px; font-size: 16px; font-weight: 700; font-family: Sarabun;
+  min-width: 70px; text-align: center;
+}
+.stat-pool {
+  background: var(--deep); border: 1px dashed var(--gold); border-radius: 10px;
+  padding: 12px; margin-bottom: 14px; text-align: center;
+}
+.stat-pool .pool-label { font-size: 11px; color: var(--cream); opacity: 0.8; margin-bottom: 6px; letter-spacing: 2px; }
+.stat-pool .pool-values { font-size: 18px; color: var(--gold); font-weight: 700; letter-spacing: 4px; }
+.stat-pool .pool-values .used { color: var(--gray); text-decoration: line-through; }
+
+/* SKILL STEP */
+.skill-chip {
+  display: inline-flex; align-items: center;
+  background: var(--deep); border: 1px solid var(--line);
+  padding: 8px 12px; border-radius: 100px; font-size: 13px;
+  color: var(--cream); cursor: pointer; transition: all 0.15s;
+  margin: 4px 4px 4px 0;
+}
+.skill-chip:active { transform: scale(0.95); }
+.skill-chip.selected { background: var(--gold); color: var(--night); border-color: var(--gold); font-weight: 600; }
+.skill-counter {
+  background: var(--deep); border: 1px solid var(--gold);
+  border-radius: 8px; padding: 8px 12px; font-size: 13px;
+  color: var(--gold); margin-bottom: 14px; text-align: center;
+}
+
+/* REVIEW STEP */
+.review-card {
+  background: var(--deep); border: 1px solid var(--gold);
+  border-radius: 12px; padding: 18px; margin-bottom: 14px;
+}
+.review-name {
+  font-family: 'Noto Serif Thai', serif;
+  font-size: 24px; color: var(--gold); font-weight: 800; text-align: center;
+  margin-bottom: 4px;
+}
+.review-sub { text-align: center; font-size: 13px; color: var(--cream); opacity: 0.8; margin-bottom: 16px; }
+.review-row {
+  display: flex; justify-content: space-between; padding: 8px 0;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+  font-size: 13px;
+}
+.review-row:last-child { border-bottom: none; }
+.review-label { color: var(--cream); opacity: 0.7; }
+.review-value { color: var(--gold); font-weight: 700; text-align: right; }
+.name-input {
+  width: 100%; background: var(--night); color: var(--gold);
+  border: 1.5px solid var(--gold); border-radius: 8px;
+  padding: 14px 16px; font-size: 18px; font-weight: 700; font-family: 'Noto Serif Thai', serif;
+  text-align: center; margin-bottom: 14px;
+}
+.name-input:focus { outline: none; box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.3); }
+
+/* NAV BUTTONS */
+.nav-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(180deg, transparent, var(--night) 30%);
+  padding: 24px 16px 20px; z-index: 10;
+}
+.nav-bar-inner { max-width: 480px; margin: 0 auto; display: flex; gap: 10px; }
+.btn {
+  flex: 1; padding: 14px; border-radius: 8px; border: none;
+  font-size: 15px; font-weight: 700; font-family: Sarabun;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn:active { transform: scale(0.97); }
+.btn-back { background: transparent; color: var(--cream); border: 1.5px solid var(--gray); }
+.btn-next { background: var(--gold); color: var(--night); flex: 2; }
+.btn-next:disabled { background: var(--gray); color: var(--deep); opacity: 0.5; cursor: not-allowed; }
+.btn-finish { background: var(--green); color: white; flex: 2; }
+
+/* LOADING & SUCCESS */
+.loading {
+  display: none; position: fixed; inset: 0; background: rgba(26, 15, 46, 0.95);
+  z-index: 100; align-items: center; justify-content: center; flex-direction: column;
+}
+.loading.active { display: flex; }
+.spinner {
+  width: 48px; height: 48px;
+  border: 3px solid rgba(212, 175, 55, 0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.loading-text { color: var(--gold); margin-top: 16px; font-family: 'Noto Serif Thai', serif; font-size: 18px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--red); color: white; padding: 10px 20px; border-radius: 8px;
+  font-size: 14px; z-index: 200; display: none;
+}
+.toast.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-eyebrow">ก่อนเปิดตัว · สร้างตัวละคร</div>
+    <h1>กำเนิดของเจ้า</h1>
+  </div>
+
+  <!-- STEPPER -->
+  <div class="stepper" id="stepper">
+    <div class="step-dot active" data-step="1"><div class="dot">1</div><div class="label">เผ่าพันธุ์</div><div class="step-line"></div></div>
+    <div class="step-dot" data-step="2"><div class="dot">2</div><div class="label">วรรณะ</div><div class="step-line"></div></div>
+    <div class="step-dot" data-step="3"><div class="dot">3</div><div class="label">พื้นเพ</div><div class="step-line"></div></div>
+    <div class="step-dot" data-step="4"><div class="dot">4</div><div class="label">ค่าสถานะ</div><div class="step-line"></div></div>
+    <div class="step-dot" data-step="5"><div class="dot">5</div><div class="label">ทักษะ</div><div class="step-line"></div></div>
+    <div class="step-dot" data-step="6"><div class="dot">6</div><div class="label">ตรวจสอบ</div></div>
+  </div>
+
+  <!-- STEP 1: RACE -->
+  <div class="step active" data-step="1">
+    <h2>เลือกเผ่าพันธุ์</h2>
+    <div class="step-desc">เผ่าพันธุ์กำหนดโบนัสค่าสถานะ ความสามารถพิเศษ และจุดเริ่มต้นในโลกของท่าน</div>
+    <div class="option-grid" id="race-grid"></div>
+  </div>
+
+  <!-- STEP 2: CLASS -->
+  <div class="step" data-step="2">
+    <h2>เลือกวรรณะ</h2>
+    <div class="step-desc">วรรณะคือบทบาท ความสามารถในการต่อสู้ และวิธีโต้ตอบกับโลก</div>
+    <div class="option-grid" id="class-grid"></div>
+  </div>
+
+  <!-- STEP 3: BACKGROUND -->
+  <div class="step" data-step="3">
+    <h2>เลือกพื้นเพ</h2>
+    <div class="step-desc">พื้นเพคือสิ่งที่เจ้าเป็นก่อนเริ่มผจญภัย ให้ทักษะ 2 อย่าง + ความสามารถพิเศษ</div>
+    <div class="option-grid" id="bg-grid"></div>
+  </div>
+
+  <!-- STEP 4: STATS -->
+  <div class="step" data-step="4">
+    <h2>กำหนดค่าสถานะ</h2>
+    <div class="step-desc">Standard array — ใช้แต่ละค่าเพียงครั้งเดียว แตะที่ค่าสถานะเพื่อเลือกตัวเลข</div>
+    <div class="stat-pool">
+      <div class="pool-label">STANDARD ARRAY</div>
+      <div class="pool-values" id="pool-display">15 · 14 · 13 · 12 · 10 · 8</div>
+    </div>
+    <div id="stats-list"></div>
+  </div>
+
+  <!-- STEP 5: SKILLS -->
+  <div class="step" data-step="5">
+    <h2>เลือกทักษะ</h2>
+    <div class="step-desc">เลือก 2 ทักษะที่เจ้าเชี่ยวชาญเป็นพิเศษ (ทักษะจากพื้นเพไม่นับ)</div>
+    <div class="skill-counter" id="skill-counter">เลือกแล้ว 0 / 2 ทักษะ</div>
+    <div id="skills-list"></div>
+  </div>
+
+  <!-- STEP 6: REVIEW -->
+  <div class="step" data-step="6">
+    <h2>ตรวจสอบและตั้งชื่อ</h2>
+    <div class="step-desc">ตรวจสอบตัวละครและตั้งชื่อให้ท่าน ก่อนเริ่มเดินทาง</div>
+    <input class="name-input" id="char-name" placeholder="ชื่อตัวละคร..." maxlength="30">
+    <div class="review-card" id="review-card"></div>
+  </div>
+
+</div>
+
+<!-- NAV -->
+<div class="nav-bar">
+  <div class="nav-bar-inner">
+    <button class="btn btn-back" id="btn-back" style="display:none">← ย้อนกลับ</button>
+    <button class="btn btn-next" id="btn-next" disabled>ถัดไป →</button>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">กำลังสร้างตัวละคร...</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ CONFIG (แก้ก่อน deploy) ============
+const LIFF_ID = "YOUR_LIFF_ID_HERE";
+const SUPABASE_URL = "https://pkjwxniumyiogbyvntyx.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBrand4bml1bXlpb2dieXZudHl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzg3ODAsImV4cCI6MjA5NDg1NDc4MH0.TOPGbwf4Mg0vEFBPbyRKsh8yeVZAU0ihKxN7WELztiA";
+
+// ============ DATA ============
+const RACES = [
+  { id: "manut", name: "มนุษย์", en: "Human", icon: "👤", desc: "ฝีมือหลากหลาย ปรับตัวเก่ง อยู่ทุกเมือง", bonus: { panya: 1, saneha: 1 }, ability: "Versatility — +1 ทุกค่าสถานะที่เลือก 1 ค่า" },
+  { id: "naga", name: "นาคา (กึ่ง)", en: "Half-Naga", icon: "🐍", desc: "ลูกครึ่งนาคา ผิวเขียวอ่อน หางเล็กที่ซ่อนได้ น้ำเป็นมิตร", bonus: { khlong: 2, panya: 1 }, ability: "ว่ายน้ำได้เร็วมาก · หายใจใต้น้ำ 10 นาที" },
+  { id: "krut", name: "ครุฑ (กึ่ง)", en: "Half-Garuda", icon: "🦅", desc: "ลูกครึ่งครุฑ ปีกเล็กที่ใต้สะบัก สายตาคม", bonus: { kamlang: 2, khlong: 1 }, ability: "ร่อนจากที่สูงโดยไม่บาดเจ็บ · มองไกล 100 วา" },
+  { id: "yak", name: "ยักษ์ (สาย)", en: "Yaksha-blood", icon: "👹", desc: "สายเลือดยักษ์เจือจาง ตัวสูงใหญ่ ผิวเขียวคล้ำเล็กน้อย", bonus: { kamlang: 2, thon: 1 }, ability: "พกหามของหนัก 2 เท่า · เห็นในที่มืด" },
+  { id: "kinnara", name: "กินรี/กินนร", en: "Kinnara", icon: "🦢", desc: "ครึ่งคนครึ่งนก เสียงไพเราะดั่งเทพ จากป่าหิมพานต์", bonus: { saneh: 2, saneha: 1 }, ability: "เสียงร้องสะกดสัตว์ · ร้องบรรยายเรื่องราวให้คนนิ่ง" },
+  { id: "lawa", name: "ลัวะ", en: "Lawa", icon: "🏔️", desc: "ชนพื้นเมืองเหนือ เก่งการอยู่ป่า พูดได้กับสัตว์", bonus: { khlong: 1, panya: 2 }, ability: "ติดตามรอยสัตว์ · พูดภาษาสัตว์ป่า 1 ครั้ง/วัน" },
+  { id: "phi", name: "ผีกึ่งคน", en: "Phi-blood", icon: "👻", desc: "เคยตายและฟื้น สีหน้าซีด ตาเห็นวิญญาณได้", bonus: { panya: 1, saneha: 2 }, ability: "เห็นและพูดกับวิญญาณได้ · หนาวเย็นเล็กน้อยตลอดเวลา" },
+  { id: "khon_dam", name: "คนดำ", en: "Khon-Dam", icon: "🌙", desc: "ชนเผ่าใต้ตำนาน ผิวคล้ำ ผูกพันกับมนตรา", bonus: { saneha: 2, saneh: 1 }, ability: "ทนพิษทุกชนิด · มนตราอาคมเริ่มต้น 1 บท" },
+];
+
+const CLASSES = [
+  { id: "nakrop", name: "นักรบ", en: "Warrior", icon: "⚔️", desc: "นักดาบหรือนักทวน ตรงไปตรงมา ทรงพลังในสมรภูมิ", primary: "kamlang", hp: 12, ability: "Second Wind · ฟื้น HP 1d10+1 ครั้ง/พัก" },
+  { id: "mohphi", name: "หมอผี", en: "Shaman", icon: "🔮", desc: "ผู้สื่อสารกับวิญญาณและผี ใช้คาถาและของขลัง", primary: "saneha", hp: 8, ability: "ส่งวิญญาณ · สาปแช่ง · เรียกผีคุ้มครอง" },
+  { id: "nakveth", name: "นักเวท", en: "Wizard", icon: "📜", desc: "ผู้เรียนคัมภีร์อมตเวท เคร่งศีล มนตราชั้นสูง", primary: "panya", hp: 6, ability: "Spellcasting · 3 คาถา + 2 บทเริ่มต้น" },
+  { id: "joke", name: "จอมโจร", en: "Rogue", icon: "🗡️", desc: "นักลอบเร้น คล่องตัว ฉลาดในเงา", primary: "khlong", hp: 8, ability: "Sneak Attack · +1d6 ดาเมจตอนซุ่ม · เปิดล็อก" },
+  { id: "phra", name: "พระธุดงค์", en: "Monk", icon: "🙏", desc: "พระสายป่า กำลังภายในแก่กล้า มือเปล่าสู้ได้", primary: "thon", hp: 8, ability: "Martial Arts · ใช้กำปั้นด้วย d4 ดาเมจ + ปกป้องด้วยลมปราณ" },
+  { id: "bard", name: "พ่อเพลง", en: "Bard", icon: "🎵", desc: "นักดนตรีเร่ร่อน เพลงเป็นเวทย์ คำเป็นมีด", primary: "saneh", hp: 8, ability: "Bardic Inspiration · ใช้เพลงเสริมพลังเพื่อน 1d6" },
+  { id: "rangwan", name: "พรานล่า", en: "Ranger", icon: "🏹", desc: "นักธนู ผู้ตามรอย เพื่อนสัตว์ป่า", primary: "khlong", hp: 10, ability: "Hunter's Mark · เลือกศัตรู เพิ่มดาเมจ +1d6" },
+  { id: "khun", name: "ขุนพล", en: "Paladin", icon: "🛡️", desc: "นักรบศักดิ์สิทธิ์ ปฏิญาณรับใช้เทพหรือเจ้านาย", primary: "kamlang", hp: 10, ability: "Lay on Hands · รักษา 5 × level · กันปีศาจ 30 วา" },
+];
+
+const BACKGROUNDS = [
+  { id: "khunnang", name: "ขุนนาง", en: "Noble", icon: "👑", desc: "เกิดในตระกูลขุนนาง รู้พิธีรีตอง คุ้นเคยกับราชสำนัก", skills: ["ประวัติศาสตร์", "ราชาศัพท์"], ability: "Position of Privilege — ราชสำนักเปิดประตูให้" },
+  { id: "phra_bg", name: "ลูกศิษย์วัด", en: "Acolyte", icon: "🛕", desc: "เคยบวชเรียนหรือเป็นลูกศิษย์พระ คุ้นเคยกับวัด", skills: ["พุทธศาสนา", "สังเกตจิต"], ability: "Shelter of the Faithful — ขอที่พักจากวัดได้ทุกที่" },
+  { id: "thahan", name: "ทหารหลวง", en: "Soldier", icon: "🎖️", desc: "เคยรับใช้กองทัพ ผ่านสงคราม รู้จักทหาร", skills: ["กรีฑา", "ขู่"], ability: "Military Rank — ทหารชั้นต่ำกว่าฟังคำสั่ง"  },
+  { id: "phokha", name: "พ่อค้า", en: "Merchant", icon: "💰", desc: "เกิดในตระกูลพ่อค้า เก่งต่อรอง รู้จักตลาดทั่วประเทศ", skills: ["ต่อรอง", "ประเมินค่า"], ability: "Merchant Network — รู้จักพ่อค้าทุกหัวเมือง" },
+  { id: "chaona", name: "ชาวนา", en: "Folk Hero", icon: "🌾", desc: "ลูกชาวนา ผ่านความยากลำบาก ฝีมือดี ใจกล้า", skills: ["เอาตัวรอด", "ดูแลสัตว์"], ability: "Rustic Hospitality — ชาวบ้านยอมรับเป็นพวก ซ่อนจากกฎหมาย" },
+  { id: "joke_bg", name: "โจรปล้น", en: "Criminal", icon: "🗝️", desc: "เคยเป็นโจรหรือนักล้วงกระเป๋า รู้กลโกง", skills: ["หลอกลวง", "ลอบเร้น"], ability: "Criminal Contact — ติดต่อใต้ดินได้ทุกเมือง" },
+  { id: "ruesee", name: "ฤๅษี", en: "Hermit", icon: "🌿", desc: "อยู่ป่าคนเดียวนาน รู้สมุนไพร ความลับลึกลับ", skills: ["ยา", "พุทธศาสนา"], ability: "Discovery — รู้ความลับใหญ่ที่ DM เลือก" },
+  { id: "nakdontri", name: "นักดนตรี", en: "Entertainer", icon: "🎭", desc: "นักแสดง นักดนตรีเร่ร่อน มีแฟนคลับ", skills: ["แสดง", "กายกรรม"], ability: "By Popular Demand — แสดงเพื่อแลกที่พัก/อาหารได้" },
+  { id: "joran", name: "คนพเนจร", en: "Outlander", icon: "🌄", desc: "เกิดในแดนไกล ป่าเขา ไม่ผูกกับเมือง", skills: ["เอาตัวรอด", "กรีฑา"], ability: "Wanderer — จำภูมิประเทศได้ หาน้ำหาอาหารได้เสมอ" },
+  { id: "luksit", name: "ลูกศิษย์เวท", en: "Sage", icon: "📚", desc: "ลูกศิษย์อาจารย์สำนักโหราเวท รู้ตำราเก่า", skills: ["เวทย์มนตร์", "ประวัติศาสตร์"], ability: "Researcher — รู้แหล่งข้อมูลหายากทุกเรื่อง" },
+];
+
+const STATS = [
+  { id: "kamlang", name: "กำลัง", en: "Strength", desc: "ความแข็งแรงทางกาย ฟันดาบ ยกของหนัก" },
+  { id: "khlong", name: "คล่อง", en: "Dexterity", desc: "ความว่องไว ยิงธนู ลอบเร้น ทรงตัว" },
+  { id: "thon", name: "ทน", en: "Constitution", desc: "ความอดทน HP สูง ทนพิษและความเหนื่อย" },
+  { id: "panya", name: "ปัญญา", en: "Intelligence", desc: "ความรู้ การเรียน เวทย์มนตร์ทางการ" },
+  { id: "saneha", name: "เสน่หา", en: "Wisdom", desc: "สัญชาตญาณ ผูกพันธรรมชาติ ผีและวิญญาณ" },
+  { id: "saneh", name: "เสน่ห์", en: "Charisma", desc: "บุคลิก พูดเก่ง เป็นผู้นำ" },
+];
+
+const SKILLS = [
+  "กรีฑา", "ลอบเร้น", "ขู่", "หลอกลวง", "ต่อรอง", "ราชาศัพท์",
+  "เอาตัวรอด", "ดูแลสัตว์", "ติดตามรอย", "ยา", "สมุนไพร",
+  "พุทธศาสนา", "เวทย์มนตร์", "ประวัติศาสตร์", "ดูดาว",
+  "สังเกตจิต", "แสดง", "กายกรรม", "ดนตรี", "ประเมินค่า",
+];
+
+const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8];
+
+// ============ STATE ============
+const state = {
+  step: 1,
+  race: null,
+  class: null,
+  background: null,
+  stats: {},
+  selectedSkills: [],
+  name: "",
+  remainingArray: [...STANDARD_ARRAY],
+};
+
+// ============ RENDER ============
+function renderRaces() {
+  const g = document.getElementById("race-grid");
+  g.innerHTML = RACES.map(r => `
+    <div class="option-card" data-id="${r.id}" onclick="selectRace('${r.id}')">
+      <div class="opt-head">
+        <div class="opt-icon">${r.icon}</div>
+        <div>
+          <div class="opt-title">${r.name}</div>
+          <div class="opt-en">${r.en}</div>
+        </div>
+      </div>
+      <div class="opt-desc">${r.desc}</div>
+      <div class="opt-stats">+${Object.entries(r.bonus).map(([k,v]) => `${v} ${STATS.find(s=>s.id===k).name}`).join(", ")} · ${r.ability}</div>
+    </div>
+  `).join("");
+}
+
+function renderClasses() {
+  const g = document.getElementById("class-grid");
+  g.innerHTML = CLASSES.map(c => `
+    <div class="option-card" data-id="${c.id}" onclick="selectClass('${c.id}')">
+      <div class="opt-head">
+        <div class="opt-icon">${c.icon}</div>
+        <div>
+          <div class="opt-title">${c.name}</div>
+          <div class="opt-en">${c.en} · HP ${c.hp} · หลัก ${STATS.find(s=>s.id===c.primary).name}</div>
+        </div>
+      </div>
+      <div class="opt-desc">${c.desc}</div>
+      <div class="opt-stats">${c.ability}</div>
+    </div>
+  `).join("");
+}
+
+function renderBackgrounds() {
+  const g = document.getElementById("bg-grid");
+  g.innerHTML = BACKGROUNDS.map(b => `
+    <div class="option-card" data-id="${b.id}" onclick="selectBackground('${b.id}')">
+      <div class="opt-head">
+        <div class="opt-icon">${b.icon}</div>
+        <div>
+          <div class="opt-title">${b.name}</div>
+          <div class="opt-en">${b.en}</div>
+        </div>
+      </div>
+      <div class="opt-desc">${b.desc}</div>
+      <div class="opt-stats">ทักษะ: ${b.skills.join(", ")} · ${b.ability}</div>
+    </div>
+  `).join("");
+}
+
+function renderStats() {
+  const list = document.getElementById("stats-list");
+  list.innerHTML = STATS.map(s => `
+    <div class="stat-row">
+      <div class="stat-info">
+        <div class="stat-name">${s.name} <span style="color:#888;font-weight:400;font-size:11px">(${s.en})</span></div>
+        <div class="stat-desc">${s.desc}</div>
+      </div>
+      <select class="stat-select" id="stat-${s.id}" onchange="onStatChange('${s.id}', this.value)">
+        <option value="">--</option>
+        ${STANDARD_ARRAY.map(v => `<option value="${v}">${v}</option>`).join("")}
+      </select>
+    </div>
+  `).join("");
+  updatePoolDisplay();
+}
+
+function updatePoolDisplay() {
+  const used = Object.values(state.stats).filter(v => v);
+  const html = STANDARD_ARRAY.map(v => {
+    const usedCount = used.filter(u => Number(u) === v).length;
+    const totalCount = STANDARD_ARRAY.filter(s => s === v).length;
+    if (usedCount >= totalCount) return `<span class="used">${v}</span>`;
+    return `<span>${v}</span>`;
+  }).join(" · ");
+  document.getElementById("pool-display").innerHTML = html;
+}
+
+function renderSkills() {
+  const list = document.getElementById("skills-list");
+  const bgSkills = state.background ? BACKGROUNDS.find(b => b.id === state.background).skills : [];
+  list.innerHTML = SKILLS.map(sk => {
+    const isBg = bgSkills.includes(sk);
+    const isSel = state.selectedSkills.includes(sk);
+    return `<div class="skill-chip ${isSel ? 'selected' : ''}" ${isBg ? 'style="opacity:0.4;pointer-events:none" title="ได้จากพื้นเพแล้ว"' : ''} onclick="toggleSkill('${sk}')">${sk}${isBg ? ' ✓' : ''}</div>`;
+  }).join("");
+  document.getElementById("skill-counter").textContent = `เลือกแล้ว ${state.selectedSkills.length} / 2 ทักษะ`;
+}
+
+function renderReview() {
+  const race = RACES.find(r => r.id === state.race);
+  const cls = CLASSES.find(c => c.id === state.class);
+  const bg = BACKGROUNDS.find(b => b.id === state.background);
+  const allSkills = [...bg.skills, ...state.selectedSkills];
+
+  const finalStats = {};
+  STATS.forEach(s => {
+    finalStats[s.id] = Number(state.stats[s.id] || 0) + (race.bonus[s.id] || 0);
+  });
+
+  document.getElementById("review-card").innerHTML = `
+    <div class="review-name">${state.name || "(ตั้งชื่อด้านบน)"}</div>
+    <div class="review-sub">${race.name} · ${cls.name} · ${bg.name}</div>
+    ${STATS.map(s => `
+      <div class="review-row">
+        <span class="review-label">${s.name} (${s.en})</span>
+        <span class="review-value">${finalStats[s.id]} ${race.bonus[s.id] ? `(+${race.bonus[s.id]})` : ''}</span>
+      </div>
+    `).join("")}
+    <div class="review-row">
+      <span class="review-label">HP เริ่มต้น</span>
+      <span class="review-value">${cls.hp + Math.floor((finalStats.thon - 10) / 2)}</span>
+    </div>
+    <div class="review-row">
+      <span class="review-label">ทักษะ</span>
+      <span class="review-value">${allSkills.join(", ")}</span>
+    </div>
+  `;
+}
+
+// ============ INTERACTIONS ============
+function selectRace(id) {
+  state.race = id;
+  document.querySelectorAll('#race-grid .option-card').forEach(c => c.classList.toggle('selected', c.dataset.id === id));
+  updateNav();
+}
+function selectClass(id) {
+  state.class = id;
+  document.querySelectorAll('#class-grid .option-card').forEach(c => c.classList.toggle('selected', c.dataset.id === id));
+  updateNav();
+}
+function selectBackground(id) {
+  state.background = id;
+  state.selectedSkills = [];
+  document.querySelectorAll('#bg-grid .option-card').forEach(c => c.classList.toggle('selected', c.dataset.id === id));
+  updateNav();
+}
+function onStatChange(statId, val) {
+  if (val === "") {
+    delete state.stats[statId];
+  } else {
+    state.stats[statId] = val;
+  }
+  // Prevent duplicates beyond array
+  const used = Object.values(state.stats);
+  STATS.forEach(s => {
+    const sel = document.getElementById(`stat-${s.id}`);
+    Array.from(sel.options).forEach(opt => {
+      if (opt.value === "") return;
+      const useCount = used.filter(u => u === opt.value).length;
+      const allowed = STANDARD_ARRAY.filter(x => String(x) === opt.value).length;
+      const isThis = state.stats[s.id] === opt.value;
+      opt.disabled = !isThis && useCount >= allowed;
+    });
+  });
+  updatePoolDisplay();
+  updateNav();
+}
+function toggleSkill(sk) {
+  const i = state.selectedSkills.indexOf(sk);
+  if (i >= 0) state.selectedSkills.splice(i, 1);
+  else if (state.selectedSkills.length < 2) state.selectedSkills.push(sk);
+  renderSkills();
+  updateNav();
+}
+
+function showStep(n) {
+  state.step = n;
+  document.querySelectorAll('.step').forEach(el => el.classList.toggle('active', Number(el.dataset.step) === n));
+  document.querySelectorAll('.step-dot').forEach(el => {
+    const s = Number(el.dataset.step);
+    el.classList.toggle('active', s === n);
+    el.classList.toggle('done', s < n);
+  });
+  document.getElementById('btn-back').style.display = n === 1 ? 'none' : 'block';
+  const btnNext = document.getElementById('btn-next');
+  if (n === 6) {
+    btnNext.textContent = "ยืนยันสร้างตัวละคร ✓";
+    btnNext.classList.remove('btn-next');
+    btnNext.classList.add('btn-finish');
+  } else {
+    btnNext.textContent = "ถัดไป →";
+    btnNext.classList.add('btn-next');
+    btnNext.classList.remove('btn-finish');
+  }
+  if (n === 5) renderSkills();
+  if (n === 6) renderReview();
+  updateNav();
+  window.scrollTo(0, 0);
+}
+
+function updateNav() {
+  const btn = document.getElementById('btn-next');
+  const validators = {
+    1: () => !!state.race,
+    2: () => !!state.class,
+    3: () => !!state.background,
+    4: () => Object.keys(state.stats).length === 6,
+    5: () => state.selectedSkills.length === 2,
+    6: () => !!state.name && state.name.trim().length >= 2,
+  };
+  btn.disabled = !validators[state.step]();
+}
+
+document.getElementById('btn-back').addEventListener('click', () => {
+  if (state.step > 1) showStep(state.step - 1);
+});
+document.getElementById('btn-next').addEventListener('click', () => {
+  if (state.step < 6) {
+    showStep(state.step + 1);
+  } else {
+    submitCharacter();
+  }
+});
+document.getElementById('char-name').addEventListener('input', e => {
+  state.name = e.target.value;
+  renderReview();
+  updateNav();
+});
+
+// ============ SUBMIT ============
+async function submitCharacter() {
+  document.getElementById('loading').classList.add('active');
+  try {
+    const profile = await liff.getProfile();
+    const race = RACES.find(r => r.id === state.race);
+    const cls = CLASSES.find(c => c.id === state.class);
+    const bg = BACKGROUNDS.find(b => b.id === state.background);
+
+    const finalStats = {};
+    STATS.forEach(s => {
+      finalStats[s.id] = Number(state.stats[s.id]) + (race.bonus[s.id] || 0);
+    });
+
+    const payload = {
+      line_user_id: profile.userId,
+      display_name: profile.displayName,
+      character: {
+        name: state.name.trim(),
+        race: race.name, race_id: state.race,
+        class: cls.name, class_id: state.class,
+        background: bg.name, background_id: state.background,
+        stats: finalStats,
+        skills: [...bg.skills, ...state.selectedSkills],
+        hp: cls.hp + Math.floor((finalStats.thon - 10) / 2),
+        mp: 10,
+      },
+    };
+
+    // Send to n8n webhook (configured separately)
+    const resp = await fetch(SUPABASE_URL + "/rest/v1/rpc/create_character_for_user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({ payload }),
+    });
+
+    if (!resp.ok && resp.status !== 404) throw new Error("Server error " + resp.status);
+
+    // Send result back to LINE chat
+    await liff.sendMessages([{
+      type: "text",
+      text: `✨ สร้างตัวละคร "${state.name}" สำเร็จ!\n${race.name} · ${cls.name} · ${bg.name}\n\nพิมพ์ "เริ่มผจญภัย" เพื่อเริ่มเล่น`,
+    }]);
+
+    document.getElementById('loading-text').textContent = "สำเร็จ! กลับไปแชท...";
+    setTimeout(() => liff.closeWindow(), 1500);
+  } catch (e) {
+    document.getElementById('loading').classList.remove('active');
+    showToast("เกิดข้อผิดพลาด: " + e.message);
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ============ INIT ============
+async function init() {
+  try {
+    if (LIFF_ID !== "2010149064-kKUXgEAq") {
+      await liff.init({ liffId: LIFF_ID });
+      if (!liff.isLoggedIn()) liff.login();
+    }
+  } catch (e) {
+    console.warn("LIFF not available, running in preview mode", e);
+  }
+  renderRaces();
+  renderClasses();
+  renderBackgrounds();
+  renderStats();
+  showStep(1);
+}
+init();
+</script>
+
+</body>
+</html>
