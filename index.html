@@ -301,8 +301,8 @@ html, body {
 <div class="toast" id="toast"></div>
 
 <script>
-// ============ CONFIG (แก้ก่อน deploy) ============
-const LIFF_ID = "YOUR_LIFF_ID_HERE";
+// ============ CONFIG (configured for production) ============
+const LIFF_ID = "2010149064-kKUXgEAq";
 const SUPABASE_URL = "https://pkjwxniumyiogbyvntyx.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBrand4bml1bXlpb2dieXZudHl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzg3ODAsImV4cCI6MjA5NDg1NDc4MH0.TOPGbwf4Mg0vEFBPbyRKsh8yeVZAU0ihKxN7WELztiA";
 
@@ -598,6 +598,14 @@ document.getElementById('char-name').addEventListener('input', e => {
 async function submitCharacter() {
   document.getElementById('loading').classList.add('active');
   try {
+    // Guard: ensure logged in before getProfile
+    if (typeof liff === 'undefined' || !liff.isLoggedIn || !liff.isLoggedIn()) {
+      if (typeof liff !== 'undefined' && liff.login) {
+        liff.login();
+        return; // Login redirect — submit ใหม่หลัง redirect กลับมา
+      }
+      throw new Error("LIFF ยังไม่พร้อม กรุณาเปิดผ่าน LINE app");
+    }
     const profile = await liff.getProfile();
     const race = RACES.find(r => r.id === state.race);
     const cls = CLASSES.find(c => c.id === state.class);
@@ -660,7 +668,7 @@ function showToast(msg) {
 // ============ INIT ============
 async function init() {
   try {
-    if (LIFF_ID !== "2010149064-kKUXgEAq") {
+    if (LIFF_ID !== "YOUR_LIFF_ID_HERE") {
       await liff.init({ liffId: LIFF_ID });
       if (!liff.isLoggedIn()) liff.login();
     }
